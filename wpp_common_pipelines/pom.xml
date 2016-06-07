@@ -33,5 +33,5 @@
                         </plugin>
         </plugins>
     </build>
-    <properties><wppcp.version>1.0.0</wppcp.version></properties>
+    <properties><wppcp.version>1.0.2</wppcp.version></properties>
     </project>
