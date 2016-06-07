@@ -20,9 +20,9 @@
                                                 <phase>package</phase>
                                                 <configuration>
                                                         <target>
-                                                                <echo message="Zipping files under src/main/java/com/hp/wpp/cd/pipeline" />
+                                                                <echo message="Zipping files under WPP" />
                                                                 <tar destfile="wppCommonPipelines-${version}.tar"
-                                                                        basedir="src/main/java/com/hp/wpp/cd/pipeline" />
+                                                                        basedir="WPP" />
                                                         </target>
                                                 </configuration>
                                                 <goals>
