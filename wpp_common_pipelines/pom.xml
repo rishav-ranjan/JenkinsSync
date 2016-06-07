@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.hp.wpp.cd.pipeline.common</groupId>
+  <artifactId>wppCommonPipelines</artifactId>
+  <version>${wppcp.version}</version>
+  <name>wppCommonPipelines</name>
+  <packaging>pom</packaging>
+  <!--url>http://maven.apache.org</url-->
+  <build>
+        <plugins>
+
+                        <plugin>
+                                <artifactId>maven-antrun-plugin</artifactId>
+                                <version>1.7</version>
+                                <executions>
+
+                                        <execution>
+                                                <id>wppCommonPipelines</id>
+                                                <phase>package</phase>
+                                                <configuration>
+                                                        <target>
+                                                                <echo message="Zipping files under src/main/java/com/hp/wpp/cd/pipeline" />
+                                                                <tar destfile="wppCommonPipelines-${version}.tar"
+                                                                        basedir="src/main/java/com/hp/wpp/cd/pipeline" />
+                                                        </target>
+                                                </configuration>
+                                                <goals>
+                                                        <goal>run</goal>
+                                                </goals>
+                                        </execution>
+                                </executions>
+                        </plugin>
+        </plugins>
+    </build>
+    <properties><wppcp.version>1.0.0</wppcp.version></properties>
+    </project>
