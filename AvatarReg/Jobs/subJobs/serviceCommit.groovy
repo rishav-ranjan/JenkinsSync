@@ -20,7 +20,7 @@ def deployAmiTargetNode = 'AMIBuilder'
 //stage 
 stage "${parentstageName}::BuildAndPublish"
 
-    subJob1 = build  job: 'buildAndPublish',
+    subJob1 = build  job: '../../wppCommon/subJobs/buildAndPublish',
                     parameters: [
                         [$class: 'StringParameterValue', name: 'credentialsId', value: gitServiceCredentials ],
                         [$class: 'StringParameterValue', name: 'url', value: gitServiceURL ],
@@ -37,7 +37,7 @@ stage "${parentstageName}::BuildAndPublish"
 
     
 stage "${parentstageName}::Deploy"
-    subJob2 = build  job: 'deploy',
+    subJob2 = build  job: '../../wppCommon/subJobs/deploy',
                     parameters: [
                         [$class: 'StringParameterValue', name: 'credentialsId', value: gitServiceCredentials ],
                         [$class: 'StringParameterValue', name: 'url', value: gitDeployURL ],
@@ -54,7 +54,7 @@ stage "${parentstageName}::Deploy"
     
     
 stage "${parentstageName}::CreateAMI"
-    subJob3 = build  job: 'createAMI',
+    subJob3 = build  job: '../../wppCommon/subJobs/createAMI',
                      parameters: [
                         [$class: 'StringParameterValue', name: 'credentialsId', value: gitServiceCredentials ],
                         [$class: 'StringParameterValue', name: 'url', value: gitDeployURL ],

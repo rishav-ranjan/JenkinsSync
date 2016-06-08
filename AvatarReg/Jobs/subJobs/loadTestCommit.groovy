@@ -21,7 +21,7 @@ def deployAmiTargetNode = 'AMIBuilder'
 //stage 
 stage "${parentstageName}::BuildAndPublish"
 
-    subJob1 = build  job: 'buildAndPublish2',
+    subJob1 = build  job: '../../wppCommon/subJobs/buildAndPublish2',
                     parameters: [
                         [$class: 'StringParameterValue', name: 'gitCredentialsId', value: gitCredentials ],
                         [$class: 'StringParameterValue', name: 'url', value: gitLoadTestURL ],
