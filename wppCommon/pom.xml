@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.hp.wpp.cd.pipeline.common</groupId>
-  <artifactId>wppAvatarReg</artifactId>
+  <artifactId>wppCommonPipelines</artifactId>
   <version>${wppcp.version}</version>
-  <name>wppAvatarReg</name>
+  <name>wppCommonPipelines</name>
   <packaging>pom</packaging>
   <!--url>http://maven.apache.org</url-->
   <build>
@@ -16,12 +16,12 @@
                                 <executions>
 
                                         <execution>
-                                                <id>wppAvatarReg</id>
+                                                <id>wppCommonPipelines</id>
                                                 <phase>package</phase>
                                                 <configuration>
                                                         <target>
                                                                 <echo message="Zipping files under Jobs" />
-                                                                <tar destfile="wppAvatarReg-${version}.tar"
+                                                                <tar destfile="wppCommonPipelines-${version}.tar"
                                                                         basedir="Jobs" />
                                                         </target>
                                                 </configuration>
