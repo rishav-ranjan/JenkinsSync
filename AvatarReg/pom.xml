@@ -5,7 +5,7 @@
   <artifactId>wppAvatarReg</artifactId>
   <version>${wppcp.version}</version>
   <name>wppAvatarReg</name>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <!--url>http://maven.apache.org</url-->
   <build>
         <plugins>
