@@ -5,7 +5,7 @@
   <artifactId>wppAvatarReg</artifactId>
   <version>${wppcp.version}</version>
   <name>wppAvatarReg</name>
-  <packaging>rar</packaging>
+  <packaging>jar</packaging>
   <!--url>http://maven.apache.org</url-->
   <build>
         <plugins>
@@ -21,7 +21,7 @@
                                                 <configuration>
                                                         <target>
                                                                 <echo message="Zipping files under Jobs" />
-                                                                <rar destfile="${project.build.directory}/${artifactId}-${version}.rar"
+                                                                <jar destfile="${project.build.directory}/${artifactId}-${version}.jar"
                                                                         basedir="Jobs" />
                                                         </target>
                                                 </configuration>
