@@ -3,7 +3,7 @@ import groovy.json.JsonSlurper
 
 //incoming parameters
 //def url = "https://github.com/WPPg2/DevOps-Deployment"
-//def credentialsId = "8cf0000b-3991-4db0-a2d9-e157168d2cef"
+//def gitCredentials = "8cf0000b-3991-4db0-a2d9-e157168d2cef"
 //def serviceName="avreg"
 //def serviceConfigPath = "/home/ec2-user/avregPipPilot/pipeline/services"
 //def amiID = "ami-0a6f966a"
@@ -13,10 +13,11 @@ import groovy.json.JsonSlurper
 
 def content
 def content2
-def SlaveWorkspaceDir
+def slaveWorkspaceDir
 
 node(targetNode)
 {
+	//get slave workspace directory
     slaveWorkspaceDir = pwd()
 }
 node('master'){
@@ -31,14 +32,17 @@ node('master'){
     builder.content.stack.template.path = "${slaveWorkspaceDir}/cloudformation/pie/templates/avatar-reg/AvatarReg.json"
     builder.content.log.temp_dir = "${slaveWorkspaceDir}"
     content = builder.toPrettyString()
+	
     // null since non-serializable
     builder=null
 }
 
 node(targetNode) {
-            git credentialsId: "${gitCredentials}", url: "$url" //git checkout before any writeFile
-            //writing manipulated json to slave node
-            writeFile file: "pideploy-${serviceName}-input${subnetNum}.json", text: content
+	//git checkout before any writeFile
+    git credentialsId: "${gitCredentials}", url: "$url" 
+	
+    //writing manipulated json to slave node
+    writeFile file: "pideploy-${serviceName}-input${subnetNum}.json", text: content
     }
 node('master'){
     //fetching json file 2
@@ -48,13 +52,14 @@ node('master'){
     def builder = new JsonBuilder(slurped)
     builder.content.stack.name = "pie-pod1-subnet${subnetNum}-${serviceName}"
     content = builder.toPrettyString()
+	
     // null since non-serializable
     builder=null
 }
 
-node(targetNode) {
-            //writing manipulated json to slave node
-            writeFile file: "wait-${serviceName}-input${subnetNum}.json", text: content
+node(targetNode){
+    //writing manipulated json to slave node
+    writeFile file: "wait-${serviceName}-input${subnetNum}.json", text: content
     }
 node('master'){
     //fetching json file 3
@@ -68,19 +73,21 @@ node('master'){
     builder.content.log.name = "pie-pod1-subnet${subnetNum}-${serviceName}.log"
     builder.content.log.temp_dir = "${slaveWorkspaceDir}"
     content = builder.toPrettyString()
+	
     // null since non-serializable
     builder=null
 }
 
 node(targetNode){
-            writeFile file: "getStackDetails-${serviceName}${subnetNum}.json", text: content
+	//writing manipulated json to slave node
+    writeFile file: "getStackDetails-${serviceName}${subnetNum}.json", text: content
         
-            println "Deploying AvatarReg on 'PIE' stack. POD1-subnet1 with ami_id: ${amiID}"
-            /*sh """cd ${slaveWorkspaceDir}/chef-repos/aws-manager-repo
-            sudo chef-client -z -w -j ${slaveWorkspaceDir}/pideploy-${serviceName}-input${subnetNum}.json -r 'recipe[cloudformation::updateStack]' -l info
-            sudo chef-client -z -w -j ${slaveWorkspaceDir}/wait-${serviceName}-input${subnetNum}.json  -r 'recipe[cloudformation::waitForStackReady]' -l info
-            sudo chef-client -z -w -j ${slaveWorkspaceDir}/getStackDetails-${serviceName}${subnetNum}.json -r 'recipe[cloudformation::getStackOutputs]' -l info
-            """*/
-            def amiContent = "ami_id=${amiID}"
-            writeFile file: "${serviceName}.log.amiid.tag", text: amiContent
-          }
+    println "Deploying AvatarReg on 'PIE' stack. POD1-subnet1 with ami_id: ${amiID}"
+    /*sh """cd ${slaveWorkspaceDir}/chef-repos/aws-manager-repo
+    sudo chef-client -z -w -j ${slaveWorkspaceDir}/pideploy-${serviceName}-input${subnetNum}.json -r 'recipe[cloudformation::updateStack]' -l info
+    sudo chef-client -z -w -j ${slaveWorkspaceDir}/wait-${serviceName}-input${subnetNum}.json  -r 'recipe[cloudformation::waitForStackReady]' -l info
+    sudo chef-client -z -w -j ${slaveWorkspaceDir}/getStackDetails-${serviceName}${subnetNum}.json -r 'recipe[cloudformation::getStackOutputs]' -l info
+    """*/
+    def amiContent = "ami_id=${amiID}"
+    writeFile file: "${serviceName}.log.amiid.tag", text: amiContent
+}

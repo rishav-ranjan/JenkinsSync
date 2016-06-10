@@ -3,7 +3,7 @@
 // parameters
 
 //url
-//gitCredentialsId
+//gitCredentials
 //serviceName
 //buildTrigger
 //repoURL
@@ -21,7 +21,7 @@ node(targetNode){
     }
 	
     //git checkout, 
-    git credentialsId: "$gitCredentialsId", url: "$url"
+    git gitCredentials: "$gitCredentials", url: "$url"
 
     
 

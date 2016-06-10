@@ -1,83 +1,69 @@
-//def mvnpath = "/opt/apache-maven-3.2.5/bin/mvn"
-
 //incoming parameters
-
 //def url = "https://github.com/WPPg2/avatar-reg"
-//def credentialsId = "8cf0000b-3991-4db0-a2d9-e157168d2cef"
+//def gitCredentials = "8cf0000b-3991-4db0-a2d9-e157168d2cef"
 //def serviceName = "avreg"
 //def buildTrigger = "NIGHTLY"
-//def repoURL = "http://52.1.56.86/nexus/content/repositories/"
-
-//def repoID = "morpheussnapshots"
-
 //def targetNode = 'Morpheus'
-
 
 def workspaceDir
 def pom
 def version
 def groupID
 def artifactVersion
-def repoID
-//example-May.26.2016.12.32.AM
-def buildTimestamp = new Date().format("MMM.dd.yyyy.hh.mm.aaa")
+def repoURL
+def buildTimestamp = new Date().format("MMM.dd.yyyy.hh.mm.aaa") //e.g. May.26.2016.12.32.AM
 def mvnpath = "/opt/apache-maven-3.2.5/bin/mvn"
+    
 node(targetNode){
     //get current workspace
     workspaceDir = pwd()
-    //git checkin
-    git credentialsId: "$credentialsId", url: "$url"
+	
+    //git checkout
+    git credentialsId: "$gitCredentials", url: "$url"
     
-    sh "${mvnpath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.version  | grep Building | cut -d' ' -f4 > maven.version"
-
+	//maven evaluate POM values
+    sh """
+    ${mvnpath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.version  | grep Building | cut -d' ' -f4 > maven.version
+    ${mvnpath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.groupId  | grep -v INFO | grep -i -v WARNING > ${workspaceDir}/maven.groupId
+	${mvnpath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.artifactId  | grep -v INFO | grep -i -v WARNING > ${workspaceDir}/maven.artifactId
+	${mvnpath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.distributionManagement.repository.url  | grep -v INFO | grep -i -v WARNING > ${workspaceDir}/maven.repoUrl"""
     
-
-    //read pom.xml
-    pom = readFile('pom.xml')
-    
-    //extract values from POM
-    def matcher = pom =~ '<avreg.version>(.+)</avreg.version>'
-    version = matcher[0][1]
-    matcher = pom =~ '<groupId>(.+)</groupId>'
-    groupID = matcher[0][1]
-    groupIdSlashed = groupID.replaceAll('\\.','/')
-    matcher = pom =~ '<artifactId>(.+)</artifactId>'
-    artifactID = matcher[0][1]
-    matcher = pom =~ '<url>.+/(.+)/</url>'
-    repoID = matcher[0][1]
-
-
+    groupID = readFile file: "${workspaceDir}/maven.groupId"
+	artifactID = readFile file: "${workspaceDir}/maven.artifactId"
+	version = readFile file: "${workspaceDir}/maven.version"
+	repoURL = readFile file: "${workspaceDir}/maven.repoUrl"
+	
+	groupID=groupID.trim()
+	groupIdSlashed = groupID.replaceAll('\\.','/')
+	artifactID=artifactID.trim()
+	version=version.trim()
+	repoURL = repoURL.trim()
 
     artifactVersion = "${version}-${buildTrigger}-${buildTimestamp}"
     echo "version ${version}"
     echo "groupID ${groupID}"
     echo "artifactID ${artifactID}"
-    //set non-serializable matcher to null
-    matcher=null
-    
-    //pre-build steps
-    
-    sh "${mvnpath} clean versions:set -DnewVersion=${artifactVersion}"
-    sh "mkdir -p /home/ec2-user/avreg"
-    sh "touch /home/ec2-user/avreg/morpheus_avatar_reg.log.properties"
-    sh "git rev-parse HEAD > /home/ec2-user/avreg/morpheus_avatar_reg_commit_sha"
-    sh 'echo "service_name=REG" > /home/ec2-user/avreg/morpheus_avatar_reg.log.properties'
+    echo "repoURL ${repoURL}"
 
-    def com_id = readFile file: "/home/ec2-user/avreg/morpheus_avatar_reg_commit_sha"
-    def commitID =com_id.trim()
+    
+    //pre-build steps    
+    sh "${mvnpath} -f ${workspaceDir}/${rootPomPath}/pom.xml clean versions:set -DnewVersion=${artifactVersion}"
+    sh "git rev-parse HEAD > ./git.sha"
+    def commitID = readFile file: "./git.sha"
+    commitID =commitID.trim()
     println "commit_id is ${commitID}"
-    sh '''commit_id=`cat /home/ec2-user/avreg/morpheus_avatar_reg_commit_sha`
-    echo "commit_id=${commit_id}" >> /home/ec2-user/avreg/morpheus_avatar_reg.log.properties'''
+    sh """echo "service_name=${serviceName}" > ${workspaceDir}/${serviceName}.log.properties
+    echo "commit_id=${commitID}" >> ${workspaceDir}/${serviceName}.log.properties"""
     
     
     //build and deploy step
-    sh "${mvnpath} -B -f ${workspaceDir}/pom.xml deploy cobertura:cobertura -Dcobertura.report.format=xml"
+    sh "${mvnpath} -B -f ${workspaceDir}/${rootPomPath}/pom.xml deploy cobertura:cobertura -Dcobertura.report.format=xml"
     
-     //outgoing parameters-artifactURL, commitID, artifactVersion i.e. ParentPomVersion, buildTimestamp
-     def fileName = "${serviceName}-restapp-${artifactVersion}.war"
-     def artifactURL = "${repoURL}${repoID}/${groupIdSlashed}/${serviceName}-restapp/${artifactVersion}/${fileName}"
+    def fileName = "${serviceName}-restapp-${artifactVersion}.war"
+    def artifactURL = "${repoURL}/${groupIdSlashed}/${serviceName}-restapp/${artifactVersion}/${fileName}"
     println artifactURL
-    //currentBuild.setDescription("#artifactURL="+artifactURL+" #commitID="+commitID+"#artifactVersion="+artifactVersion+"#buildTimestamp="+buildTimestamp)
+	
+	//return values - artifactURL, artifactVersion, commitID
     currentBuild.setDescription("#artifactURL="+artifactURL+"#artifactVersion="+artifactVersion+"#commitID="+commitID)
 }
 
