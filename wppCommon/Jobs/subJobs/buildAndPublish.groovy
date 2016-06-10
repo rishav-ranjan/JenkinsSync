@@ -23,10 +23,10 @@ node(targetNode){
     
 	//maven evaluate POM values
     sh """
-    ${mvnpath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.version  | grep Building | cut -d' ' -f4 > maven.version
-    ${mvnpath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.groupId  | grep -v INFO | grep -i -v WARNING > ${workspaceDir}/maven.groupId
-	${mvnpath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.artifactId  | grep -v INFO | grep -i -v WARNING > ${workspaceDir}/maven.artifactId
-	${mvnpath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.distributionManagement.repository.url  | grep -v INFO | grep -i -v WARNING > ${workspaceDir}/maven.repoUrl"""
+    ${mvnpath} -f ${workspaceDir}/${rootPomPath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.version  | grep Building | cut -d' ' -f4 > maven.version
+    ${mvnpath} -f ${workspaceDir}/${rootPomPath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.groupId  | grep -v INFO | grep -i -v WARNING > ${workspaceDir}/maven.groupId
+	${mvnpath} -f ${workspaceDir}/${rootPomPath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.artifactId  | grep -v INFO | grep -i -v WARNING > ${workspaceDir}/maven.artifactId
+	${mvnpath} -f ${workspaceDir}/${rootPomPath} org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.distributionManagement.repository.url  | grep -v INFO | grep -i -v WARNING > ${workspaceDir}/maven.repoUrl"""
     
     groupID = readFile file: "${workspaceDir}/maven.groupId"
 	artifactID = readFile file: "${workspaceDir}/maven.artifactId"
