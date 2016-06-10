@@ -9,6 +9,7 @@ import groovy.json.JsonSlurper
 //def instanceID="i-576d7efb"
 //def serviceConfigPath = "/home/ec2-user/avregPipPilot/pipeline/services"
 //def targetNode = 'AMIBuilder'
+//def artifactVersion
 
 //variables specific to json file
 def cookbookVersion="1.0.13"

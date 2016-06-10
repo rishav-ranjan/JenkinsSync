@@ -4,7 +4,6 @@ import groovy.json.JsonSlurper
 //incoming parameters
 //def url = "https://github.com/WPPg2/DevOps-Deployment"
 //def gitCredentials = "8cf0000b-3991-4db0-a2d9-e157168d2cef"
-//def cookbookVersion="1.0.13"
 //def serviceName="avreg"
 //def serviceConfigPath = "/home/ec2-user/avregPipPilot/pipeline/services"
 //def artifactURL
