@@ -21,7 +21,7 @@
                                                 <configuration>
                                                         <target>
                                                                 <echo message="Zipping files under Jobs" />
-                                                                <tar destfile="${project.build.directory}/${artifactId}-${version}.jar"
+                                                                <jar destfile="${project.build.directory}/${artifactId}-${version}.jar"
                                                                         basedir="Jobs" />
                                                         </target>
                                                 </configuration>
